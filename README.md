@@ -233,7 +233,8 @@ GROUP BY activity_date
 ```
 ### Product Sales Analysis III
 ```sql
-WITH Min_Year_Table AS (
+WITH 
+    Min_Year_Table AS (
     SELECT product_id, MIN(year) min_year
     FROM Sales
     GROUP BY product_id)
