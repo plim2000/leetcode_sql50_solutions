@@ -133,3 +133,87 @@ SELECT s.user_id, COALESCE(ROUND((c.confirm_count / t.total_count), 2), 0) confi
 FROM Signups s LEFT JOIN Total_Count_Table t USING(user_id)
                LEFT JOIN Confirm_Count_Table c USING(user_id)
 ```
+
+## Basic Aggregate Functions
+### Not Boring Movies
+```sql
+SELECT *
+FROM Cinema
+WHERE id % 2 != 0 AND description != 'boring'
+ORDER BY rating DESC
+```
+### Average Selling Price
+```sql
+SELECT p.product_id, coalesce(round(sum(p.price*u.units)/sum(u.units),2),0) average_price
+FROM Prices p LEFT JOIN Unitssold u ON (p.product_id = u.product_id)
+                                    AND (u.purchase_date BETWEEN p.start_date AND p.end_date)
+GROUP BY p.product_id
+```
+### Project Employees I
+```sql
+SELECT p.project_id, ROUND(SUM(e.experience_years)/COUNT(*),2) average_years
+FROM Project p JOIN Employee e ON (p.employee_id = e.employee_id)
+GROUP BY p.project_id
+```
+### Percentage of Users Attended a Contest
+```sql
+SELECT r.contest_id, ROUND(COUNT(DISTINCT r.user_id)/(SELECT COUNT(*) FROM users)*100, 2) percentage
+FROM Users u RIGHT JOIN Register r ON (u.user_id = r.user_id)
+GROUP BY r.contest_id
+ORDER BY percentage DESC, contest_id
+```
+### Queries Quality and Percentage
+```sql
+SELECT query_name, 
+    ROUND(SUM(rating/position) / COUNT(*), 2) quality,
+    ROUND(SUM(CASE WHEN rating < 3 THEN 1 ELSE 0 end) * 100 / COUNT(*), 2) poor_query_percentage
+FROM Queries
+WHERE query_name IS NOT NULL
+GROUP BY query_name
+```
+### Monthly Transactions I
+```sql
+SELECT DATE_FORMAT(trans_date, '%Y-%m') month, 
+  country, 
+  COUNT(*) trans_count, 
+  SUM(CASE WHEN state = 'approved' THEN 1 ELSE 0 END) approved_count,
+  SUM(amount) trans_total_amount,
+  SUM(CASE WHEN state = 'approved' THEN amount ELSE 0 END) approved_total_amount
+FROM transactions
+GROUP BY month, country
+
+```
+### Immediate Food Delivery II
+```sql
+WITH 
+    Modified_Delivery AS (
+        SELECT *, 
+            CASE WHEN order_date = customer_pref_delivery_date THEN 'immediate' ELSE 'scheduled' END
+            order_type,
+            RANK() OVER (PARTITION BY customer_id ORDER BY order_date) order_rank
+        FROM Delivery),
+    Order_Counts AS (
+        SELECT COUNT(*) first_order,
+            SUM(CASE WHEN order_type = 'immediate' THEN 1 ELSE 0 END) immediate_count
+        FROM Modified_Delivery
+        WHERE order_rank = 1)
+    
+SELECT round(immediate_count / first_order * 100, 2) immediate_percentage
+FROM Order_Counts
+```
+### Game Play Analysis IV
+```sql
+WITH 
+    First_Login_Table AS (
+        SELECT player_id, MIN(event_date) first_login_date
+        FROM Activity
+        GROUP BY player_id),
+    Login_After_First_Table AS (
+        SELECT a.player_id, COUNT(*) login_after_first
+        FROM Activity a JOIN First_Login_Table ftl USING(player_id)
+        WHERE event_date = DATE_ADD(first_login_date, INTERVAL 1 DAY)
+        GROUP BY a.player_id)
+
+SELECT ROUND(COUNT(DISTINCT player_id) / (SELECT COUNT(DISTINCT player_id) FROM Activity), 2) fraction
+FROM Login_After_First_Table
+```
