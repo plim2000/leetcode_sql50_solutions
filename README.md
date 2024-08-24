@@ -47,5 +47,88 @@ WHERE LENGTH(content) > 15
 ## Basic Joins
 ### Replace Employee ID With The Unique Identifier
 ```sql
+SELECT EmployeeUNI.unique_id, Employees.name
+FROM Employees LEFT JOIN EmployeeUNI ON (Employees.id = EmployeeUNI.id)
+```
+### Product Sales Analysis I
+```sql
+SELECT Product.product_name, Sales.year, Sales.price
+FROM Sales JOIN Product ON (Sales.product_id = Product.product_id)
+```
+### Customer Who Visited but Did Not Make Any Transactions
+```sql
+SELECT v.customer_id, COUNT(*) count_no_trans
+FROM Visits v LEFT JOIN Transactions t ON v.visit_id = t.visit_id
+WHERE t.transaction_id IS NULL
+GROUP BY v.customer_id
+```
+### Rising Temperature
+```sql
+SELECT w1.id
+FROM Weather w1 JOIN Weather w2 ON w1.recordDate = DATE_ADD(w2.recordDate, Interval 1 DAY)
+WHERE w1.temperature > w2.temperature
+```
+### Average Time of Process per Machine
+```sql
+SELECT machine_id,
+       ROUND(AVG(p.end_time - p.start_time), 3) processing_time
+FROM   (SELECT machine_id, 
+               process_id,
+               MAX(CASE WHEN activity_type = 'start' THEN timestamp END) start_time,
+               MAX(CASE WHEN activity_type = 'end' THEN timestamp END) end_time
+        FROM Activity
+        GROUP BY machine_id, process_id) p
+GROUP BY machine_id
+```
+### Employee Bonus
+```sql
+SELECT e.name, b.bonus
+FROM Employee e LEFT JOIN Bonus b ON (e.empId = b.empId)
+WHERE COALESCE(b.bonus, 0) < 1000
+```
+### Students and Examinations
+```sql
+WITH 
+    StudentSubject AS (
+    SELECT st.student_id, st.student_name, su.subject_name
+    FROM Students st
+    CROSS JOIN Subjects su),
 
+    AttendedExams AS (
+    SELECT e.student_id, e.subject_name, count(*) exam_count
+    FROM Examinations e
+    GROUP BY e.student_id, e.subject_name)
+
+SELECT ss.student_id, ss.student_name, ss.subject_name, COALESCE(ae.exam_count, 0) attended_exams
+FROM StudentSubject ss LEFT JOIN AttendedExams ae ON (ss.student_id = ae.student_id)
+                                                  AND (ss.subject_name = ae.subject_name)
+ORDER BY ss.student_id, ss.subject_name
+```
+### Managers with at Least 5 Direct Reports
+```sql
+with manager_count_table as (
+    select managerid, count(*) manager_count
+    from employee
+    group by managerid)
+
+select name
+from employee e left join manager_count_table m on (e.id = m.managerid)
+where m.manager_count >= 5
+```
+### Confirmation Rate
+```sql
+with
+    total_count_table as (
+    select user_id, count(*) total_count
+    from confirmations
+    group by user_id),
+
+    confirm_count_table as (
+    select user_id, sum(case when action = 'confirmed' then 1 else 0 end) confirm_count
+    from confirmations
+    group by user_id)
+
+select s.user_id, coalesce(round((c.confirm_count / t.total_count), 2), 0) confirmation_rate
+from signups s left join total_count_table t using(user_id)
+               left join confirm_count_table c using(user_id)
 ```
