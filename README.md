@@ -181,7 +181,6 @@ SELECT DATE_FORMAT(trans_date, '%Y-%m') month,
   SUM(CASE WHEN state = 'approved' THEN amount ELSE 0 END) approved_total_amount
 FROM transactions
 GROUP BY month, country
-
 ```
 ### Immediate Food Delivery II
 ```sql
@@ -216,4 +215,30 @@ WITH
 
 SELECT ROUND(COUNT(DISTINCT player_id) / (SELECT COUNT(DISTINCT player_id) FROM Activity), 2) fraction
 FROM Login_After_First_Table
+```
+
+## Sorting and Grouping
+### Number of Unique Subjects Taught by Each Teacher
+```sql
+SELECT teacher_id, COUNT(DISTINCT subject_id) cnt
+FROM Teacher
+GROUP BY teacher_id
+```
+### User Activity for the Past 30 Days I
+```sql
+SELECT activity_date day, count(DISTINCT user_id) active_users
+FROM Activity
+WHERE activity_date BETWEEN DATE_SUB('2019-07-27', INTERVAL 29 DAY) AND '2019-07-27'
+GROUP BY activity_date
+```
+### Product Sales Analysis III
+```sql
+WITH Min_Year_Table AS (
+    SELECT product_id, MIN(year) min_year
+    FROM Sales
+    GROUP BY product_id)
+
+SELECT s.product_id, myt.min_year first_year, s.quantity, s.price
+FROM Sales s JOIN Min_Year_Table myt USING(product_id)
+WHERE s.year = myt.min_year
 ```
