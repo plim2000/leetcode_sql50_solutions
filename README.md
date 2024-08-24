@@ -12,32 +12,32 @@ Documenting my [LeetCode SQL50](https://leetcode.com/studyplan/top-sql-50/) solu
 
 
 ## Select
-### Recyclable and Low Fat Products
+### 1757. Recyclable and Low Fat Products
 ```sql
 SELECT product_id
 FROM Products
 WHERE low_fats = 'Y' AND recyclable = 'Y'
 ```
-### Find Customer Referee
+### 584. Find Customer Referee
 ```sql
 SELECT name
 FROM Customer
 WHERE referee_id != 2 OR referee_id is NULL
 ```
-### Big Countries
+### 595. Big Countries
 ```sql
 SELECT name, population, area
 FROM World
 WHERE area >= 3000000 OR population >= 25000000
 ```
-### Article Views I
+### 1148. Article Views I
 ```sql
 SELECT DISTINCT author_id AS id
 FROM Views
 WHERE author_id = viewer_id
 ORDER BY author_id
 ```
-### Invalid Tweets
+### 1683. Invalid Tweets
 ```sql
 SELECT tweet_id
 FROM Tweets
@@ -45,30 +45,30 @@ WHERE LENGTH(content) > 15
 ```
 
 ## Basic Joins
-### Replace Employee ID With The Unique Identifier
+### 1378. Replace Employee ID With The Unique Identifier
 ```sql
 SELECT EmployeeUNI.unique_id, Employees.name
 FROM Employees LEFT JOIN EmployeeUNI ON (Employees.id = EmployeeUNI.id)
 ```
-### Product Sales Analysis I
+### 1068. Product Sales Analysis I
 ```sql
 SELECT Product.product_name, Sales.year, Sales.price
 FROM Sales JOIN Product ON (Sales.product_id = Product.product_id)
 ```
-### Customer Who Visited but Did Not Make Any Transactions
+### 1581. Customer Who Visited but Did Not Make Any Transactions
 ```sql
 SELECT v.customer_id, COUNT(*) count_no_trans
 FROM Visits v LEFT JOIN Transactions t ON v.visit_id = t.visit_id
 WHERE t.transaction_id IS NULL
 GROUP BY v.customer_id
 ```
-### Rising Temperature
+### 197. Rising Temperature
 ```sql
 SELECT w1.id
 FROM Weather w1 JOIN Weather w2 ON w1.recordDate = DATE_ADD(w2.recordDate, Interval 1 DAY)
 WHERE w1.temperature > w2.temperature
 ```
-### Average Time of Process per Machine
+### 1661. Average Time of Process per Machine
 ```sql
 SELECT machine_id,
        ROUND(AVG(p.end_time - p.start_time), 3) processing_time
@@ -80,13 +80,13 @@ FROM   (SELECT machine_id,
         GROUP BY machine_id, process_id) p
 GROUP BY machine_id
 ```
-### Employee Bonus
+### 577. Employee Bonus
 ```sql
 SELECT e.name, b.bonus
 FROM Employee e LEFT JOIN Bonus b ON (e.empId = b.empId)
 WHERE COALESCE(b.bonus, 0) < 1000
 ```
-### Students and Examinations
+### 1280. Students and Examinations
 ```sql
 WITH 
     StudentSubject AS (
@@ -104,7 +104,7 @@ FROM StudentSubject ss LEFT JOIN AttendedExams ae ON (ss.student_id = ae.student
                                                   AND (ss.subject_name = ae.subject_name)
 ORDER BY ss.student_id, ss.subject_name
 ```
-### Managers with at Least 5 Direct Reports
+### 570. Managers with at Least 5 Direct Reports
 ```sql
 WITH
     Manager_Count_Table AS (
@@ -116,7 +116,7 @@ SELECT name
 FROM Employee e LEFT JOIN Manager_Count_Table m ON (e.id = m.managerid)
 WHERE m.manager_count >= 5
 ```
-### Confirmation Rate
+### 1934. Confirmation Rate
 ```sql
 WITH
     Total_Count_Table AS (
@@ -135,34 +135,34 @@ FROM Signups s LEFT JOIN Total_Count_Table t USING(user_id)
 ```
 
 ## Basic Aggregate Functions
-### Not Boring Movies
+### 620. Not Boring Movies
 ```sql
 SELECT *
 FROM Cinema
 WHERE id % 2 != 0 AND description != 'boring'
 ORDER BY rating DESC
 ```
-### Average Selling Price
+### 1251. Average Selling Price
 ```sql
 SELECT p.product_id, coalesce(round(sum(p.price*u.units)/sum(u.units),2),0) average_price
 FROM Prices p LEFT JOIN Unitssold u ON (p.product_id = u.product_id)
                                     AND (u.purchase_date BETWEEN p.start_date AND p.end_date)
 GROUP BY p.product_id
 ```
-### Project Employees I
+### 1075. Project Employees I
 ```sql
 SELECT p.project_id, ROUND(SUM(e.experience_years)/COUNT(*),2) average_years
 FROM Project p JOIN Employee e ON (p.employee_id = e.employee_id)
 GROUP BY p.project_id
 ```
-### Percentage of Users Attended a Contest
+### 1633. Percentage of Users Attended a Contest
 ```sql
 SELECT r.contest_id, ROUND(COUNT(DISTINCT r.user_id)/(SELECT COUNT(*) FROM users)*100, 2) percentage
 FROM Users u RIGHT JOIN Register r ON (u.user_id = r.user_id)
 GROUP BY r.contest_id
 ORDER BY percentage DESC, contest_id
 ```
-### Queries Quality and Percentage
+### 1211. Queries Quality and Percentage
 ```sql
 SELECT query_name, 
     ROUND(SUM(rating/position) / COUNT(*), 2) quality,
@@ -171,7 +171,7 @@ FROM Queries
 WHERE query_name IS NOT NULL
 GROUP BY query_name
 ```
-### Monthly Transactions I
+### 1193. Monthly Transactions I
 ```sql
 SELECT DATE_FORMAT(trans_date, '%Y-%m') month, 
   country, 
@@ -182,7 +182,7 @@ SELECT DATE_FORMAT(trans_date, '%Y-%m') month,
 FROM transactions
 GROUP BY month, country
 ```
-### Immediate Food Delivery II
+### 1174. Immediate Food Delivery II
 ```sql
 WITH 
     Modified_Delivery AS (
@@ -200,7 +200,7 @@ WITH
 SELECT round(immediate_count / first_order * 100, 2) immediate_percentage
 FROM Order_Counts
 ```
-### Game Play Analysis IV
+### 550. Game Play Analysis IV
 ```sql
 WITH 
     First_Login_Table AS (
@@ -218,20 +218,20 @@ FROM Login_After_First_Table
 ```
 
 ## Sorting and Grouping
-### Number of Unique Subjects Taught by Each Teacher
+### 2356. Number of Unique Subjects Taught by Each Teacher
 ```sql
 SELECT teacher_id, COUNT(DISTINCT subject_id) cnt
 FROM Teacher
 GROUP BY teacher_id
 ```
-### User Activity for the Past 30 Days I
+### 1141. User Activity for the Past 30 Days I
 ```sql
 SELECT activity_date day, count(DISTINCT user_id) active_users
 FROM Activity
 WHERE activity_date BETWEEN DATE_SUB('2019-07-27', INTERVAL 29 DAY) AND '2019-07-27'
 GROUP BY activity_date
 ```
-### Product Sales Analysis III
+### 1070. Product Sales Analysis III
 ```sql
 WITH 
     Min_Year_Table AS (
