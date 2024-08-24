@@ -43,3 +43,9 @@ SELECT tweet_id
 FROM Tweets
 WHERE LENGTH(content) > 15
 ```
+
+## Basic Joins
+### Replace Employee ID With The Unique Identifier
+```sql
+
+```
