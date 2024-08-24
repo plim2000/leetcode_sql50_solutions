@@ -106,29 +106,30 @@ ORDER BY ss.student_id, ss.subject_name
 ```
 ### Managers with at Least 5 Direct Reports
 ```sql
-with manager_count_table as (
-    select managerid, count(*) manager_count
-    from employee
-    group by managerid)
+WITH
+    manager_count_table AS (
+    SELECT managerid, COUNT(*) manager_count
+    FROM employee
+    GROUP BY managerid)
 
-select name
-from employee e left join manager_count_table m on (e.id = m.managerid)
-where m.manager_count >= 5
+SELECT name
+FROM employee e LEFT JOIN manager_count_table m ON (e.id = m.managerid)
+WHERE m.manager_count >= 5
 ```
 ### Confirmation Rate
 ```sql
-with
-    total_count_table as (
-    select user_id, count(*) total_count
-    from confirmations
-    group by user_id),
+WITH
+    total_count_table AS (
+    SELECT user_id, count(*) total_count
+    FROM confirmations
+    GROUP BY user_id),
 
-    confirm_count_table as (
-    select user_id, sum(case when action = 'confirmed' then 1 else 0 end) confirm_count
-    from confirmations
-    group by user_id)
+    confirm_count_table AS (
+    SELECT user_id, SUM(CASE WHEN action = 'confirmed' THEN 1 ELSE 0 end) confirm_count
+    FROM confirmations
+    GROUP BY user_id)
 
-select s.user_id, coalesce(round((c.confirm_count / t.total_count), 2), 0) confirmation_rate
-from signups s left join total_count_table t using(user_id)
-               left join confirm_count_table c using(user_id)
+SELECT s.user_id, COALESCE(ROUND((c.confirm_count / t.total_count), 2), 0) confirmation_rate
+FROM signups s LEFT JOIN total_count_table t USING(user_id)
+               LEFT JOIN confirm_count_table c USING(user_id)
 ```
