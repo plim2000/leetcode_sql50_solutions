@@ -243,3 +243,45 @@ SELECT s.product_id, myt.min_year first_year, s.quantity, s.price
 FROM Sales s JOIN Min_Year_Table myt USING(product_id)
 WHERE s.year = myt.min_year
 ```
+### 596. Classes More Than 5 Students
+```sql
+SELECT class
+FROM Courses
+GROUP BY class
+HAVING count(student) >= 5
+```
+### 1729. Find Followers Count
+```sql
+SELECT user_id, count(*) followers_count
+FROM Followers
+GROUP BY user_id
+ORDER BY user_id
+```
+### 619. Biggest Single Number
+```sql
+WITH
+    num_count_table AS (
+    SELECT num
+    FROM MyNumbers
+    GROUP BY num
+    HAVING COUNT(num) = 1)
+
+SELECT max(num) num
+FROM num_count_table
+```
+### 1045. Customers Who Bought All Products
+```sql
+SELECT customer_id
+FROM Customer
+GROUP BY customer_id
+HAVING COUNT(DISTINCT product_key) = (SELECT COUNT(DISTINCT product_key) FROM Product)
+```
+
+## Advanced Select and Joins
+### 1731. The Number of Employees Which Report to Each Employee
+```sql
+SELECT e1.employee_id, e1.name, COUNT(e2.reports_to) reports_count, ROUND(AVG(e2.age),0) average_age
+FROM employees e1 JOIN employees e2 ON e1.employee_id = e2.reports_to
+GROUP BY e1.employee_id, e1.name
+ORDER BY e1.employee_id
+```
