@@ -290,7 +290,8 @@ ORDER BY e1.employee_id
 SELECT employee_id, department_id
 FROM (
     SELECT *, COUNT(*) OVER (PARTITION BY employee_id) employee_count
-    FROM Employee) Employee_Count_Table
+    FROM Employee
+    ) Employee_Count_Table
 WHERE employee_count = 1 OR primary_flag = 'Y'
 ```
 ### 610. Triangle Judgement
