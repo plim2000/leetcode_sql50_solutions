@@ -285,3 +285,68 @@ FROM employees e1 JOIN employees e2 ON e1.employee_id = e2.reports_to
 GROUP BY e1.employee_id, e1.name
 ORDER BY e1.employee_id
 ```
+### 1789. Primary Department for Each Employee
+```sql
+SELECT employee_id, department_id
+FROM (
+    SELECT *, COUNT(*) OVER (PARTITION BY employee_id) employee_count
+    FROM Employee) Employee_Count_Table
+WHERE employee_count = 1 OR primary_flag = 'Y'
+```
+### 610. Triangle Judgement
+```sql
+SELECT *,
+    CASE WHEN (x < y + z) AND (y < x + z) AND (z < x + y) THEN 'Yes' ELSE 'No' END triangle
+FROM Triangle
+```
+### 180. Consecutive Numbers
+```sql
+WITH 
+    Adjacent_Num_Table AS (
+    SELECT *,
+        LAG(id, 1) OVER (ORDER BY id) prior_id,
+        LEAD(id, 1) OVER (ORDER BY id) next_id,
+        LAG(num, 1) OVER (ORDER BY id) prior_num,
+        LEAD(num, 1) OVER (ORDER BY id) next_num
+    FROM Logs),
+
+    Consecutive_Table AS (
+    SELECT num,
+        SUM(CASE WHEN (id - 1 = prior_id) AND (id + 1 = next_id) AND (num = prior_num) AND (num = next_num) THEN 1 ELSE 0 END) consecutive_count
+    FROM Adjacent_Num_Table
+    GROUP BY num)
+
+SELECT num ConsecutiveNums
+FROM Consecutive_Table
+WHERE consecutive_count >= 1
+```
+### 1164. Product Price at a Given Date
+```sql
+WITH
+    Price_Rank_Table AS (
+    SELECT *,
+        RANK() OVER (PARTITION BY product_id ORDER BY change_date DESC) price_rank
+    FROM Products
+    WHERE change_date <= '2019-08-16'),
+   
+    Product_Id_Table AS(
+    SELECT DISTINCT product_id
+    FROM Products)
+
+SELECT product_id,
+    CASE WHEN new_price IS NULL THEN 10 ELSE new_price END price
+FROM  Product_Id_Table LEFT JOIN Price_Rank_Table USING(product_id)
+WHERE price_rank = 1 OR price_rank IS NULL
+```
+### 1204. Last Person to Fit in the Bus
+```sql
+SELECT person_name
+FROM (
+    SELECT *,
+    SUM(weight) OVER (ORDER BY turn) running_weight
+    FROM Queue
+    ) running_weight_table
+WHERE running_weight <= 1000
+ORDER BY turn DESC
+LIMIT 1
+```
