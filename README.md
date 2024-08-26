@@ -312,7 +312,10 @@ WITH
 
     Consecutive_Table AS (
     SELECT num,
-        SUM(CASE WHEN (id - 1 = prior_id) AND (id + 1 = next_id) AND (num = prior_num) AND (num = next_num) THEN 1 ELSE 0 END) consecutive_count
+        SUM(CASE WHEN (id - 1 = prior_id)
+            AND (id + 1 = next_id)
+            AND (num = prior_num)
+            AND (num = next_num) THEN 1 ELSE 0 END) consecutive_count
     FROM Adjacent_Num_Table
     GROUP BY num)
 
