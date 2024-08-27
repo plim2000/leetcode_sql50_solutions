@@ -472,27 +472,7 @@ LIMIT 1
 ```
 ### 585. Investments in 2016
 '''sql
-WITH 
-    Tiv_2015_Count_Table AS (
-    SELECT tiv_2015, COUNT(*) AS tiv_2015_count
-    FROM Insurance
-    GROUP BY tiv_2015),
-
-    Location_Table AS (
-    SELECT pid, CONCAT(lat, lon) AS lat_lon
-    FROM Insurance),
-
-    Location_Count_Table AS (
-    SELECT lat_lon, COUNT(*) lat_lon_count
-    FROM Insurance i JOIN Location_Table lt USING (pid)
-        JOIN Tiv_2015_Count_Table USING(tiv_2015)
-    GROUP BY lat_lon)
-
-SELECT ROUND(SUM(tiv_2016),2) tiv_2016
-FROM Insurance i 
-    JOIN Location_Table lt USING (pid)
-    JOIN Tiv_2015_Count_Table tct USING (tiv_2015)
-    JOIN Location_Count_Table lct USING (lat_lon)
-WHERE tiv_2015_count > 1 AND lat_lon_count = 1
+SELECT *
+FROM some_table
 '''
 
