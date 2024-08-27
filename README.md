@@ -354,3 +354,97 @@ WHERE running_weight <= 1000
 ORDER BY turn DESC
 LIMIT 1
 ```
+### 1907. Count Salary Categories
+```sql
+WITH
+    Categorized_Table AS (
+    SELECT *,
+        CASE WHEN income < 20000 THEN 'Low Salary' WHEN income BETWEEN 20000 AND 50000 THEN 'Average Salary' ELSE 'High Salary' END category
+    FROM Accounts),
+
+    Category_Id_Table AS (
+    SELECT 'Low Salary' category
+    UNION
+    SELECT 'Average Salary'
+    UNION
+    SELECT 'High Salary')
+
+SELECT cit.category, COUNT(ct.category) accounts_count
+FROM Category_Id_Table cit LEFT JOIN Categorized_Table ct USING(category)
+GROUP BY cit.category
+```
+
+## Subqueries
+### 1978. Employees Whose Manager Left the Company
+```sql
+SELECT employee_id
+FROM Employees
+WHERE manager_id NOT IN (SELECT DISTINCT employee_ID FROM Employees)
+    AND salary < 30000
+ORDER BY employee_id
+```
+### 626. Exchange Seats
+```sql
+WITH 
+    Aggregate_Table AS (
+    SELECT MAX(id) max_id
+    FROM Seat),
+
+    New_Id_Table AS (
+    SELECT *, 
+        MOD(id, 2) even_or_odd,
+        CASE WHEN MOD(id, 2) = 1 THEN id + 1 ELSE id - 1 END new_id
+    FROM Seat)
+    
+Select 
+    CASE WHEN (nit.id = at.max_id AND MOD(nit.id,2) = 1) THEN nit.id ELSE nit.new_id END id,
+    student 
+FROM Aggregate_Table at CROSS JOIN New_Id_Table nit
+ORDER BY id
+```
+### 1341. Movie Rating
+```sql
+WITH
+    Highest_Reviewer AS (
+    SELECT u.user_id, u.name, COUNT(*) user_count
+    FROM Users u JOIN MovieRating mr USING (user_id)
+    GROUP BY u.user_id
+    ORDER BY user_count DESC, u.name
+    LIMIT 1),
+
+    Average_Movie_Review AS (
+    SELECT m.title, AVG(mr.rating) avg_rating
+    FROM MovieRating mr JOIN Movies m USING (movie_id)
+    WHERE DATE_FORMAT(created_at, '%Y-%m') = '2020-02'
+    GROUP BY m.title
+    ORDER BY avg_rating DESC, m.title
+    LIMIT 1)
+
+SELECT (SELECT name FROM Highest_Reviewer) results
+UNION ALL
+SELECT (SELECT title FROM Average_movie_Review)
+
+```
+### 1321. Restaurant Growth
+```sql
+WITH 
+    Smallest_Date_Table AS (
+    SELECT MIN(visited_on) smallest_date
+    FROM Customer
+    ORDER BY visited_on
+    LIMIT 1),
+
+    Consolidate_Dates_Table AS (
+    SELECT visited_on, SUM(amount) amount
+    FROM Customer
+    GROUP BY visited_on),
+    
+    Prior_Amounts_Table AS(
+    SELECT *,
+        SUM(cdt.amount) OVER (ORDER BY cdt.visited_on ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) last_7_days_amount
+    FROM Consolidate_Dates_Table cdt CROSS JOIN Smallest_Date_Table sdt)
+
+SELECT visited_on, last_7_days_amount AS amount, ROUND(last_7_days_amount / 7, 2) AS average_amount
+FROM Prior_Amounts_Table
+WHERE visited_on >= smallest_date + 6
+```
