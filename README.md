@@ -509,6 +509,18 @@ AND (lat, lon) IN (
     FROM Insurance
     GROUP BY lat, lon
     HAVING COUNT(*) = 1)
+``` 
+### 185. Department Top Three Salaries
+```sql
+WITH 
+    Salary_Rank_Table AS (
+    SELECT *,
+        DENSE_RANK() OVER (PARTITION BY departmentId ORDER BY salary DESC) AS salary_rank
+    FROM Employee)
+
+SELECT d.name AS Department, srt.name AS Employee, srt.salary AS Salary
+FROM Salary_Rank_Table srt JOIN Department d ON srt.departmentId = d.id
+WHERE srt.salary_rank <= 3
 ```
 
 ## Advanced String Functions / Regex / Clause
