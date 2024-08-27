@@ -448,6 +448,7 @@ SELECT visited_on, last_7_days_amount AS amount, ROUND(last_7_days_amount / 7, 2
 FROM Prior_Amounts_Table
 WHERE visited_on >= smallest_date + 6
 ```
+or...
 ```sql
 SELECT DISTINCT visited_on,
     SUM(amount) OVER (ORDER BY visited_on RANGE BETWEEN INTERVAL 6 DAY PRECEDING AND CURRENT ROW) amount,
