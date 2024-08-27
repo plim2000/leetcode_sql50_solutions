@@ -511,3 +511,16 @@ AND (lat, lon) IN (
     HAVING COUNT(*) = 1)
 ```
 
+## Advanced String Functions / Regex / Clause
+### 1667. Fix Names in a Table
+```sql
+SELECT user_id, CONCAT(UPPER(LEFT(name,1)), LOWER(SUBSTRING(name,2))) AS name
+FROM Users
+ORDER BY user_id
+```
+### 1527. Patients With a Condition
+```sql
+SELECT *
+FROM Patients
+WHERE conditions REGEXP '\\bDIAB1'
+```
