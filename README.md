@@ -456,3 +456,57 @@ SELECT DISTINCT visited_on,
 FROM customer
 LIMIT 18446744073709551615 OFFSET 6;
 ```
+### 602. Friend Requests II: Who Has the Most Friends
+```sql 
+WITH 
+    Friend_Count_Table AS (
+    SELECT requester_id AS friend_id FROM RequestAccepted
+    UNION ALL
+    SELECT accepter_id FROM RequestAccepted)
+
+SELECT friend_id AS id, COUNT(*) AS num
+FROM Friend_Count_Table
+GROUP BY friend_id
+ORDER BY num DESC
+LIMIT 1
+```
+### 585. Investments in 2016
+'''sql
+WITH 
+    Tiv_2015_Count_Table AS (
+    SELECT tiv_2015, COUNT(*) AS tiv_2015_count
+    FROM Insurance
+    GROUP BY tiv_2015),
+
+    Location_Table AS (
+    SELECT pid, CONCAT(lat, lon) AS lat_lon
+    FROM Insurance),
+
+    Location_Count_Table AS (
+    SELECT lat_lon, COUNT(*) lat_lon_count
+    FROM Insurance i JOIN Location_Table lt USING (pid)
+        JOIN Tiv_2015_Count_Table USING(tiv_2015)
+    GROUP BY lat_lon)
+
+SELECT ROUND(SUM(tiv_2016),2) tiv_2016
+FROM Insurance i 
+    JOIN Location_Table lt USING (pid)
+    JOIN Tiv_2015_Count_Table tct USING (tiv_2015)
+    JOIN Location_Count_Table lct USING (lat_lon)
+WHERE tiv_2015_count > 1 AND lat_lon_count = 1
+'''
+or...
+'''sql
+SELECT ROUND(SUM(tiv_2016), 2) AS tiv_2016
+FROM Insurance
+WHERE tiv_2015 IN (
+    SELECT tiv_2015
+    FROM Insurance
+    GROUP BY tiv_2015
+    HAVING COUNT(*) > 1)
+AND (lat, lon) IN (
+    SELECT lat, lon
+    FROM Insurance
+    GROUP BY lat, lon
+    HAVING COUNT(*) = 1)
+'''
