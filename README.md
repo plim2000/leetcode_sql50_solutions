@@ -523,7 +523,7 @@ FROM Salary_Rank_Table srt JOIN Department d ON srt.departmentId = d.id
 WHERE srt.salary_rank <= 3
 ```
 
-## Advanced String Functions / Regex / Clause
+## Advanced String Functions/Regex/Clause
 ### 1667. Fix Names in a Table
 ```sql
 SELECT user_id, CONCAT(UPPER(LEFT(name,1)), LOWER(SUBSTRING(name,2))) AS name
