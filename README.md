@@ -536,3 +536,42 @@ SELECT *
 FROM Patients
 WHERE conditions REGEXP '\\bDIAB1'
 ```
+### 196. Delete Duplicate Emails
+```sql
+DELETE p1
+FROM Person p1 
+JOIN (
+    SELECT email, MIN(id) AS min_id
+    FROM Person
+    GROUP BY email) p2
+USING (email)
+WHERE p1.id > p2.min_id;
+```
+### 176. Second Highest Salary
+```sql
+SELECT MAX(salary) AS SecondHighestSalary 
+FROM Employee 
+WHERE salary < (SELECT MAX(salary) FROM employee);
+```
+### 1484. Group Sold Products By The Date
+```sql
+SELECT sell_date, COUNT(DISTINCT product) AS num_sold,
+    GROUP_CONCAT(DISTINCT product ORDER BY product ASC SEPARATOR ',' ) AS products
+FROM Activities 
+GROUP BY sell_date 
+ORDER BY sell_date ASC;
+```
+### 1327. List the Products Ordered in a Period
+```sql
+SELECT p.product_name, SUM(o.unit) AS unit
+FROM Products p JOIN Orders o USING (product_id)
+WHERE MONTH(o.order_date) = '02' AND YEAR(o.order_date) = '2020'
+GROUP BY p.product_name
+HAVING SUM(o.unit) >= 100;
+```
+### 1517. Find Users With Valid E-Mails
+```sql
+SELECT user_id, name, mail
+FROM Users
+WHERE mail REGEXP '^[a-zA-Z][a-zA-Z0-9_.-]*@leetcode\\.com$'
+```
